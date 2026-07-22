@@ -1,0 +1,57 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "1. Install backend dependencies",
+      "type": "shell",
+      "options": { "cwd": "${workspaceFolder}/backend" },
+      "command": "python -m venv .venv && .venv/bin/pip install -r requirements.txt",
+      "windows": {
+        "command": "python -m venv .venv; .\\.venv\\Scripts\\pip install -r requirements.txt"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "2. Load demo data",
+      "type": "shell",
+      "options": { "cwd": "${workspaceFolder}/backend" },
+      "command": ".venv/bin/python -m app.seed",
+      "windows": { "command": ".\\.venv\\Scripts\\python -m app.seed" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Run backend",
+      "type": "shell",
+      "options": { "cwd": "${workspaceFolder}/backend" },
+      "command": ".venv/bin/uvicorn app.main:app --reload --port 8000",
+      "windows": {
+        "command": ".\\.venv\\Scripts\\uvicorn app.main:app --reload --port 8000"
+      },
+      "isBackground": true,
+      "presentation": { "group": "app", "panel": "dedicated" },
+      "problemMatcher": []
+    },
+    {
+      "label": "3. Install frontend dependencies",
+      "type": "shell",
+      "options": { "cwd": "${workspaceFolder}/frontend" },
+      "command": "npm install",
+      "problemMatcher": []
+    },
+    {
+      "label": "Run frontend",
+      "type": "shell",
+      "options": { "cwd": "${workspaceFolder}/frontend" },
+      "command": "npm run dev",
+      "isBackground": true,
+      "presentation": { "group": "app", "panel": "dedicated" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Run everything",
+      "dependsOn": ["Run backend", "Run frontend"],
+      "dependsOrder": "parallel",
+      "problemMatcher": []
+    }
+  ]
+}
