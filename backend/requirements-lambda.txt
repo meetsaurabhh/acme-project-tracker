@@ -1,3 +1,0 @@
-# Everything the API needs, plus the Lambda adapter.
--r requirements.txt
-mangum==0.19.0
