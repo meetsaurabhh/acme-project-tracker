@@ -14,13 +14,13 @@ for i in {1..40}; do
 done
 
 echo "==> Loading demo data"
-docker compose exec -T backend python -m app.seed
+docker compose exec -T backend python -m app.seeds.seed_data
 
 cat <<'MSG'
 
 Everything is running.
 
-  App        http://localhost:5173
+  App        http://localhost:3030
   API docs   http://localhost:8000/docs
 
 Sign in with:

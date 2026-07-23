@@ -17,7 +17,7 @@ specific screen and a specific API endpoint. Use this table when you present.
 
 ## The risk model, in plain words
 
-`backend/app/services.py` runs six checks against every open project:
+`backend/app/services/project_service.py` runs six checks against every open project:
 
 1. The end date has passed and the project is not marked complete.
 2. Schedule used exceeds work delivered by 20 percentage points or more.

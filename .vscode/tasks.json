@@ -15,8 +15,8 @@
       "label": "2. Load demo data",
       "type": "shell",
       "options": { "cwd": "${workspaceFolder}/backend" },
-      "command": ".venv/bin/python -m app.seed",
-      "windows": { "command": ".\\.venv\\Scripts\\python -m app.seed" },
+      "command": ".venv/bin/python -m app.seeds.seed_data",
+      "windows": { "command": ".\\.venv\\Scripts\\python -m app.seeds.seed_data" },
       "problemMatcher": []
     },
     {

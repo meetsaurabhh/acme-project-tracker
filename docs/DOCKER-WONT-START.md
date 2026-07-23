@@ -137,7 +137,7 @@ pip install -r requirements.txt
 $env:DATABASE_URL="PASTE_YOUR_CONNECTION_STRING_HERE"
 $env:JWT_SECRET="any-long-random-text-you-like"
 
-python -m app.seed
+python -m app.seeds.seed_data
 uvicorn app.main:app --reload
 ```
 
@@ -163,7 +163,7 @@ copy .env.example .env
 npm run dev
 ```
 
-It prints `Local: http://localhost:5173/`. Open that in your browser and sign
+It prints `Local: http://localhost:3030/`. Open that in your browser and sign
 in with `admin@acme.com` / `Admin@123`.
 
 ### C5. Every time you come back to it
@@ -182,7 +182,7 @@ cd C:\path\to\acme-pm\frontend
 npm run dev
 ```
 
-You only run `python -m app.seed` again if you want to wipe the data and start
+You only run `python -m app.seeds.seed_data` again if you want to wipe the data and start
 fresh.
 
 ---

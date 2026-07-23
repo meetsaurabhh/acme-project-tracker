@@ -74,10 +74,10 @@ Same as on your laptop. In the VS Code terminal:
 
 ```powershell
 docker compose up -d --build
-docker compose exec -T backend python -m app.seed
+docker compose exec -T backend python -m app.seeds.seed_data
 ```
 
-Open http://localhost:5173.
+Open http://localhost:3030.
 
 Most VDIs block this, because running Docker inside an already-virtual machine
 needs nested virtualization and IT usually turns it off. If it fails, do not
@@ -112,7 +112,7 @@ connection string in it:
 ```
 DATABASE_URL=postgresql+psycopg2://postgres:YOUR_PASSWORD@localhost:5432/acme_pm
 JWT_SECRET=any-long-random-text-you-like
-CORS_ORIGINS=http://localhost:5173
+CORS_ORIGINS=http://localhost:3030
 ```
 
 Doing it this way means you never have to retype the connection string again.
@@ -148,7 +148,7 @@ cd backend
 python -m venv .venv
 .\.venv\Scripts\activate
 pip install -r requirements.txt
-python -m app.seed
+python -m app.seeds.seed_data
 uvicorn app.main:app --reload
 ```
 
@@ -160,7 +160,7 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:5173 and sign in as `admin@acme.com` / `Admin@123`.
+Open http://localhost:3030 and sign in as `admin@acme.com` / `Admin@123`.
 
 > If `.\.venv\Scripts\activate` is refused with an execution policy error, run
 > this once, then try again:

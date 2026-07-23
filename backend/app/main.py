@@ -1,31 +1,30 @@
-"""FastAPI application entry point."""
+"""Application entry point: wiring only, no business logic."""
 
 import logging
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
-from .config import settings
-from .database import Base, engine
-from .routers import (
-    allocations,
-    analytics,
-    auth,
-    budget,
-    deliverables,
-    projects,
-    resources,
-    users,
-)
+from app.api.router import api_router
+from app.core.config import settings
+from app.core.exceptions import AppError
+from app.db.base import Base
+from app.db.session import engine
+
+# Importing the models package registers every table on Base.metadata.
+import app.models  # noqa: F401
 
 logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = FastAPI(
-    title="ACME Project Tracker API",
+    title=settings.app_name,
+    version=settings.app_version,
     description="Centralised project, deliverable, resource and budget tracking.",
-    version="1.0.0",
 )
 
+# --- Allow the React frontend to call this API from its own origin ---
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origin_list,
@@ -35,24 +34,35 @@ app.add_middleware(
 )
 
 
+# --- Translate service-layer errors into HTTP responses.
+#     This is why services can raise plain Python exceptions and stay
+#     independent of the web framework. ---
+@app.exception_handler(AppError)
+def handle_app_error(request: Request, exc: AppError) -> JSONResponse:
+    headers = {"WWW-Authenticate": "Bearer"} if exc.status_code == 401 else None
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.message},
+        headers=headers,
+    )
+
+
 @app.on_event("startup")
-def on_startup():
-    """Create any missing tables. Good enough for a workshop; a production
-    system would use Alembic migrations instead."""
+def on_startup() -> None:
+    """Create any missing tables.
+
+    Adequate for a workshop. A production system would use Alembic migrations
+    so schema changes are versioned and reversible.
+    """
     Base.metadata.create_all(bind=engine)
-    logging.info("Database tables are ready.")
+    logger.info("Database tables are ready.")
 
 
-@app.get("/health", tags=["system"])
-def health():
-    return {"status": "ok"}
+@app.get("/health", tags=["System"])
+def health_check() -> dict:
+    """Liveness probe. Used by the deployment scripts and by load balancers."""
+    return {"status": "ok", "version": settings.app_version}
 
 
-app.include_router(auth.router)
-app.include_router(users.router)
-app.include_router(projects.router)
-app.include_router(deliverables.router)
-app.include_router(resources.router)
-app.include_router(allocations.router)
-app.include_router(budget.router)
-app.include_router(analytics.router)
+# --- Every route in the application, mounted under /api ---
+app.include_router(api_router)

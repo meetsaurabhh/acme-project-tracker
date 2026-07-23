@@ -4,7 +4,7 @@
 
 ```
 Browser
-   │  React + Material UI (port 5173)
+   │  React + Material UI (port 3030)
    │  axios attaches a JWT to every request
    ▼
 FastAPI  (port 8000)
@@ -52,7 +52,7 @@ every request. The token carries the email and role; the backend re-reads the
 user from the database on each request so a deactivated account stops working
 immediately rather than when the token expires.
 
-Three roles, enforced by FastAPI dependencies in `deps.py`:
+Three roles, enforced by FastAPI dependencies in `core/dependencies.py`:
 
 | Role | Read | Create/edit projects, deliverables, people, spend | Manage accounts |
 |---|---|---|---|
@@ -69,11 +69,11 @@ tidiness. The backend is the thing that actually enforces it.
 
 | You want to... | Edit this |
 |---|---|
-| Change the at-risk rules | `backend/app/services.py` → `project_metrics` |
-| Add a field to a project | `models.py`, then `schemas.py`, then the form in `frontend/src/pages/Projects.jsx` |
+| Change the at-risk rules | `backend/app/services/project_service.py` → `_assess_risk` |
+| Add a field to a project | `models/project.py`, then `dto/project_dto.py`, then the form in `frontend/src/pages/Projects.jsx` |
 | Add a new screen | new file in `frontend/src/pages/`, add a route in `App.jsx`, add a link in `components/Layout.jsx` |
 | Change colours or fonts | `frontend/src/theme.js` |
-| Change the demo data | `backend/app/seed.py`, then run `./scripts/reset-db.sh` |
+| Change the demo data | `backend/app/seeds/seed_data.py`, then rerun the seed |
 
 ---
 
@@ -87,5 +87,8 @@ These are deliberate, and worth naming out loud in a demo rather than hiding:
   anything you care about.
 - The JWT secret is in `docker-compose.yml` as plain text. In AWS it belongs in
   Secrets Manager.
-- There are no automated tests yet. `services.py` is the highest-value place to
-  add them, because that is where the business rules live.
+- There are no automated tests yet. `services/project_service.py` is the
+  highest-value place to add them, because that is where the business rules live.
+
+For the full package-by-package breakdown, see
+[BACKEND-ARCHITECTURE.md](./BACKEND-ARCHITECTURE.md).

@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     access_token_minutes: int = 480  # 8 hours
 
     # Which frontend origins are allowed to call this API.
-    cors_origins: str = "http://localhost:5173,http://localhost:3000"
+    cors_origins: str = "http://localhost:3030,http://localhost:5173,http://localhost:3000"
 
     class Config:
         env_file = ".env"

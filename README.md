@@ -15,7 +15,7 @@ Three pieces talk to each other:
 
 | Piece | What it does | Where you see it |
 |---|---|---|
-| **Frontend** (React + Material UI) | The screens you click on | http://localhost:5173 |
+| **Frontend** (React + Material UI) | The screens you click on | http://localhost:3030 |
 | **Backend** (Python / FastAPI) | The rules and the maths | http://localhost:8000/docs |
 | **Database** (PostgreSQL) | Where the data actually lives | port 5432 |
 
@@ -57,7 +57,7 @@ On Windows PowerShell, run these three lines instead:
 ```powershell
 docker compose up -d --build
 Start-Sleep -Seconds 25
-docker compose exec -T backend python -m app.seed
+docker compose exec -T backend python -m app.seeds.seed_data
 ```
 
 The first run takes a few minutes because it downloads the base images. When
@@ -67,7 +67,7 @@ it finishes you will see the demo login details printed.
 
 ## 4. Open the app
 
-Go to **http://localhost:5173** and sign in:
+Go to **http://localhost:3030** and sign in:
 
 | Email | Password | What they can do |
 |---|---|---|
@@ -130,7 +130,7 @@ python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 export DATABASE_URL="postgresql+psycopg2://acme:acme@localhost:5432/acme_pm"
-python -m app.seed
+python -m app.seeds.seed_data
 uvicorn app.main:app --reload
 ```
 
@@ -190,7 +190,7 @@ function behind API Gateway. It is a good extension task if you have time.
 - Email or Slack alerts when a project crosses into "at risk"
 - Audit trail of who changed what
 - Gantt view built on the dependency chain data that is already there
-- Unit tests with pytest for the risk-scoring rules in `backend/app/services.py`
+- Unit tests with pytest for the risk-scoring rules in `backend/app/services/project_service.py`
 
 ---
 
@@ -198,24 +198,26 @@ function behind API Gateway. It is a good extension task if you have time.
 
 ```
 acme-pm/
-├── backend/            Python API
+├── backend/                    Python API (layered architecture)
 │   └── app/
-│       ├── main.py         starts the server
-│       ├── models.py       the database tables
-│       ├── schemas.py      what data is allowed in and out
-│       ├── services.py     risk, budget and dependency calculations
-│       ├── security.py     password hashing and tokens
-│       ├── deps.py         "who is logged in, and may they do this?"
-│       ├── seed.py         demo data
-│       └── routers/        one file per area of the API
-├── frontend/           React app
+│       ├── main.py                 creates the app, mounts the router
+│       ├── api/                    HTTP routes only
+│       ├── services/               business rules
+│       ├── repositories/           every database query
+│       ├── models/                 ORM entities
+│       ├── dto/                    request and response shapes
+│       ├── core/                   config, security, dependencies, errors
+│       ├── db/                     engine and session
+│       └── seeds/                  demo data
+├── frontend/                   React app
 │   └── src/
-│       ├── pages/          one file per screen
-│       ├── components/     shared UI pieces
-│       ├── api.js          talks to the backend
-│       ├── auth.jsx        keeps track of who is signed in
-│       └── theme.js        colours and typography
-├── infra/terraform/    AWS infrastructure
-├── scripts/            setup, reset and deploy
-└── docker-compose.yml  runs all three pieces together
+│       ├── pages/                  one file per screen
+│       ├── components/             shared UI pieces
+│       ├── api.js                  talks to the backend
+│       ├── auth.jsx                keeps track of who is signed in
+│       └── theme.js                colours and typography
+├── infra/terraform/            AWS infrastructure
+├── infra/localstack/           LocalStack infrastructure
+├── scripts/                    setup, reset and deploy
+└── docker-compose.yml          runs all three pieces together
 ```

@@ -10,3 +10,12 @@ dist/
 .terraform/
 *.tfstate
 *.tfstate.backup
+
+# LocalStack / Lambda build artefacts
+infra/localstack/build/
+infra/localstack/.terraform/
+frontend/.env.production
+
+# Never commit real credentials
+backend/.env
+frontend/.env

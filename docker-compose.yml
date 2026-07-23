@@ -9,6 +9,7 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    networks: [acme]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U acme -d acme_pm"]
       interval: 5s
@@ -20,12 +21,13 @@ services:
     environment:
       DATABASE_URL: postgresql+psycopg2://acme:acme@db:5432/acme_pm
       JWT_SECRET: dev-secret-change-me
-      CORS_ORIGINS: http://localhost:5173,http://localhost:3000
+      CORS_ORIGINS: "http://localhost:3030,http://localhost:5173"
     ports:
       - "8000:8000"
     depends_on:
       db:
         condition: service_healthy
+    networks: [acme]
     volumes:
       - ./backend/app:/code/app
 
@@ -34,11 +36,34 @@ services:
     environment:
       VITE_API_URL: http://localhost:8000
     ports:
-      - "5173:5173"
+      - "3030:3030"
     depends_on:
       - backend
+    networks: [acme]
     volumes:
       - ./frontend/src:/app/src
 
+  # Only starts when you ask for it: docker compose --profile cloud up -d
+  localstack:
+    image: localstack/localstack:latest
+    profiles: ["cloud"]
+    ports:
+      - "4566:4566"
+    environment:
+      SERVICES: s3,lambda,apigateway,iam,cloudformation,logs,sts
+      DEBUG: 1
+      # Lambda containers must join this network to reach the db container.
+      LAMBDA_DOCKER_NETWORK: acme-net
+      LOCALSTACK_AUTH_TOKEN: ${LOCALSTACK_AUTH_TOKEN:-}
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "localstack_data:/var/lib/localstack"
+    networks: [acme]
+
+networks:
+  acme:
+    name: acme-net
+
 volumes:
   pgdata:
+  localstack_data:
